@@ -6,13 +6,14 @@ angular.module('app')
     .controller('SearchCtrl', ['leagueApi', '$scope', '$rootScope', 'summonerStatsFactory',
         function(leagueApi, $scope, $rootScope, summonerStatsFactory){
 
-        // View variables
-        $scope.summonerName = "Elo Boosted";
+        //variables
+        $scope.summonerName = "";
         $scope.regions = ['oce', 'na', 'eune', 'euw', 'kr'];
         $scope.selectedRegion = $scope.regions[0];
         $scope.summonerStats = null;
         $scope.unranked = null;
         $scope.ranked = null;
+        $scope.viewActive = true;
 
         //
         // Setting the region
@@ -168,20 +169,37 @@ angular.module('app')
                         }
 
                         //push final api data to service
-                        $scope.summonerStats = {
-                            unranked: $scope.unranked,
-                            ranked: $scope.ranked
-                        };
-                        summonerStatsFactory.set($scope.summonerStats);
+                        //$scope.summonerStats = {
+                        //    name: $scope.summonerName,
+                        //    unranked: $scope.unranked,
+                        //    ranked: $scope.ranked
+                        //};
+                        //summonerStatsFactory.set($scope.summonerStats);
+                        //
+                        //$rootScope.$broadcast('apiFinished')
+                        //
+                        //$scope.viewActive = false;
 
-                        $rootScope.$broadcast('apiFinished')
+                    })
 
-
-                    }).error(function(){
+                        //.error(function(){
                         //Insert message saying that the user is yet to play ranked
-                        console.log('test')
-                        $scope.ranked = 'Player is yet to play Ranked mode';
-                    });
+                        //$scope.ranked = 'Player is yet to play Ranked mode';
+
+                    //});
+
+                    //push final api data to service
+                    $scope.summonerStats = {
+                        name: $scope.summonerName,
+                        unranked: $scope.unranked,
+                        ranked: $scope.ranked
+                    };
+                    summonerStatsFactory.set($scope.summonerStats);
+
+                    $rootScope.$broadcast('apiFinished')
+
+
+                    $scope.viewActive = false;
                 });
             })
 
@@ -191,10 +209,21 @@ angular.module('app')
 
     //Page control
     .controller('ViewCtrl', ['$scope', 'summonerStatsFactory', function($scope, summonerStatsFactory){
-        $scope.$on('apiFinished', function(){
-            summonerStatsFactory.get()
-        })
+        $scope.viewActive = false;
 
+        $scope.$on('apiFinished', function(){
+            $scope.summonerStats = summonerStatsFactory.get();
+            $scope.viewActive = true;
+
+            //View variables
+            $scope.summonerName = $scope.summonerStats.name;
+            $scope.unrankedStats = $scope.summonerStats.unranked;
+            if($scope.summonerStats.ranked !== null) {
+                $scope.ranked = $scope.summonerStats.ranked;
+            }else{
+                $scope.ranked = 'Summoner is yet to play Ranked mode';
+            }
+        })
     }]);
 
 
