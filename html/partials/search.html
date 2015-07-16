@@ -1,0 +1,12 @@
+<div>
+    <div>
+        <div  class="region-button"
+              ng-repeat="region in regions"
+              ng-class="{'selected' : region == selectedRegion}"
+              ng-click="selectRegion(region)">
+            {{region | uppercase}}
+        </div>
+    </div>
+    <input placeholder="Summoner Name" ng-model="summonerName" type="text" on-enter="getSummonerStats(summonerName)"/>
+    <div class="button-api" ng-click="getSummonerStats(summonerName)"></div>
+</div>

@@ -1,0 +1,109 @@
+$scope.summonerName = null;
+        $scope.regions = ['oce', 'na', 'eune', 'euw', 'kr'];
+        $scope.selectedRegion = $scope.regions[0];
+
+        //Set region
+        $scope.selectRegion = function(region){
+            $scope.selectedRegion = region;
+            console.log($scope.selectedRegion)
+        };
+
+        //Get champion info
+        leagueApi.getChampionInfo().success(function(data){
+            $scope.championArray = data.data;
+            $scope.championNameArray = Object.keys(data.data);
+        });
+
+        //utilising id from param to obtain champion name and title
+        $scope.getChampionName = function(id){
+            for(var i = 0; i < $scope.championNameArray.length; i++){
+                if($scope.championArray[$scope.championNameArray[i]].id == id){
+                    var champion = {
+                        name: $scope.championArray[$scope.championNameArray[i]].name,
+                        title: $scope.championArray[$scope.championNameArray[i]].title
+                    };
+                    return champion;
+                }
+            }
+        };
+
+        //Get summoner stats
+        //Getting the id
+        $scope.getSummonerStats = function(name) {
+            leagueApi.getSummonerId($scope.selectedRegion, name).success(function (data) {
+
+                //Obtaining summoner name and ID as stored in API object
+                var summonerNameApi = Object.keys(data)[0];
+                var summonerId = data[summonerNameApi].id;
+                $scope.summonerName = data[summonerNameApi].name;
+
+                //Obtaining summoner unranked stats
+                leagueApi.getSummonerData($scope.selectedRegion, summonerId).success(function (data) {
+
+                    //storing data for unranked game types
+                    var playerStats = data['playerStatSummaries'];
+                    for(var i = 0; i < playerStats.length; i++){
+                        //5x5
+                        if(playerStats[i].playerStatSummaryType == 'Unranked'){
+                            $scope.unranked = {
+                                wins: playerStats[i].wins,
+                                assists: playerStats[i].aggregatedStats.totalAssists,
+                                kills: playerStats[i].aggregatedStats.totalKills,
+                                minions: playerStats[i].aggregatedStats.totalMinionKills,
+                                neutralCreeps: playerStats[i].aggregatedStats.totalNeutralMinionsKilled
+                            }
+                        }
+                        //3x3
+                        if(playerStats[i].playerStatSummaryType == 'Unranked3x3'){
+                            $scope.unranked3x3 = {
+                                wins: playerStats[i].wins,
+                                assists: playerStats[i].aggregatedStats.totalAssists,
+                                kills: playerStats[i].aggregatedStats.totalKills,
+                                minions: playerStats[i].aggregatedStats.totalMinionKills,
+                                neutralCreeps: playerStats[i].aggregatedStats.totalNeutralMinionsKilled
+                            }
+                        }
+
+                        //Aram
+                        if(playerStats[i].playerStatSummaryType == 'AramUnranked5x5'){
+                            $scope.aram = {
+                                wins: playerStats[i].wins,
+                                assists: playerStats[i].aggregatedStats.totalAssists,
+                                kills: playerStats[i].aggregatedStats.totalKills,
+                                minions: playerStats[i].aggregatedStats.totalMinionKills,
+                                neutralCreeps: playerStats[i].aggregatedStats.totalNeutralMinionsKilled
+                            }
+                        }
+                    };
+                });
+
+                //Obtaining summoner ranked stats
+                leagueApi.getSummonerRankedData($scope.selectedRegion, summonerId).success(function(data){
+
+                    $scope.rankedStats = [];
+                    var playerRankedStats = data['champions'];
+
+                    //storing ranked stats for each individual champion user has played
+                    for(var i = 0; i < playerRankedStats.length; i++) {
+                        $scope.champion = $scope.getChampionName(playerRankedStats[i].id);
+
+                        if($scope.champion){
+                            var champ = {
+                                name: $scope.champion.name,
+                                title: $scope.champion.title,
+                                kills: playerRankedStats[i].stats.totalChampionKills,
+                                double: playerRankedStats[i].stats.totalDoubleKills,
+                                triple: playerRankedStats[i].stats.totalTripleKills,
+                                quadra: playerRankedStats[i].stats.totalQuadraKills,
+                                penta: playerRankedStats[i].stats.totalPentaKills
+
+                            }
+                            $scope.rankedStats.push(champ);
+                        }else {
+
+                        }
+                    }
+                    console.log($scope.rankedStats)
+                })
+            });
+        };

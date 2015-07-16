@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="app">
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+        <!-- Stylesheets-->
+        <link rel="stylesheet" type="text/css" href="css/normalize.css">
+        <link rel="stylesheet" type="text/css" href="css/main.css">
+
+    </head>
+
+    <body>
+        <div id="page-container">
+            <summoner-search ng-controller="SearchCtrl"></summoner-search>
+            <summoner-profile ng-controller="ViewCtrl"></summoner-profile>
+        </div>
+
+
+        <!-- Libraries  -->
+        <script type="text/javascript" src="lib/jquery-1.11.3.min.js"></script>
+        <script src="lib/angular.js "></script>
+
+        <!-- Angular Scripts-->
+        <script src="js/angular/app.js"></script>
+        <script src="js/angular/controllers.js"></script>
+        <script src="js/angular/directives.js"></script>
+        <script src="js/angular/filters.js"></script>
+        <script src="js/angular/routes.js"></script>
+        <script src="js/angular/services.js"></script>
+    </body>
+</html>
