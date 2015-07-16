@@ -1,5 +1,7 @@
 angular.module('app')
 
+    //Emilio is always right, Eric too
+
     // League info
     .controller('SearchCtrl', ['leagueApi', '$scope', '$rootScope', 'summonerStatsFactory',
         function(leagueApi, $scope, $rootScope, summonerStatsFactory){
