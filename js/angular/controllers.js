@@ -1,6 +1,6 @@
 angular.module('app')
 
-    //Emilio is always right, Eric too
+    //No, Emilio is more right than Erica
 
     // League info
     .controller('SearchCtrl', ['leagueApi', '$scope', '$rootScope', 'summonerStatsFactory',
