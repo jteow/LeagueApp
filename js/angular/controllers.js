@@ -1,6 +1,6 @@
 angular.module('app')
 
-    //Emilio is always right, Eric too (lots of changes)
+    //Emilio is always right, Eric too (lots of changes) Joey commits are stronger
 
     // League info
     .controller('SearchCtrl', ['leagueApi', '$scope', '$rootScope', 'summonerStatsFactory',
