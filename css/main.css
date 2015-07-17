@@ -1,5 +1,138 @@
-.button-api {
-    width:50px;
-    height:20px;
-    background:red;
+.clearfix:after {
+    content: " ";
+    display: block;
+    height: 0;
+    clear: both;
+}
+
+body {
+    width: 100%; height: 100%;
+    background: #222;
+    background-image: url('http://pre08.deviantart.net/044d/th/pre/i/2013/084/4/2/league_of_legends_twitch_tv_background_by_traumuhh-d5z86sk.jpg');
+    background-repeat: no-repeat;
+    background-size: 100%;
+}
+
+#page-container {
+    width: 1020px;
+    margin: auto;
+    margin-top: 50px;
+    padding: 120px 20px 100px;
+    text-align: center;
+    background: transparent;
+}
+
+summoner-search {
+    width: 400px;
+    height: 500px;
+    margin: auto;
+}
+
+#search-title{
+    font-size: 24px;
+    color: #ddd;
+    margin-bottom: 40px;
+}
+
+.region-button {
+    width: 70px;
+    display: inline-block;
+    padding: 9px 0px;
+    margin: 1px;
+    background: #333;
+    color: white;
+    box-shadow: 1px 1px 5px #333;
+    cursor: pointer;
+}
+
+.region-button:hover {
+    opacity: 0.6;
+}
+
+#search-field-container {
+    display: inline-table;
+    margin-top: 10px;
+}
+
+summoner-search input {
+    width: 284px;
+    padding: 6px 0px;
+    background: white;
+    float: left;
+}
+
+#button-api {
+    display: table-cell;
+    vertical-align: middle;
+    width: 70px;
+    padding: 7px 0px 8px;
+    margin-left: -1px;
+    background: white;
+    color: #333;
+    float: left;
+    cursor: pointer;
+    border: none;
+    box-shadow: 1px 1px 2px #888;
+}
+
+#back {
+    position: relative;
+    left: 10px;
+    top: 10px;
+    display: table-cell;
+    vertical-align: middle;
+    width: 70px;
+    padding: 7px 0px;
+    background: #333;
+    color: white;
+    cursor: pointer;
+    box-shadow: 1px 1px 5px #333;
+}
+
+#ranked-stats-container {
+    width: 100%;
+    margin: auto;
+}
+
+h2{
+    position: relative;
+}
+
+#overall {
+    margin: auto;
+    display: inline-block;
+    margin-bottom: 50px;
+}
+
+#ranked-stats-container p {
+    width: 300px;
+    margin: 2px 20px;
+    float: left;
+    clear: both;
+    text-align: left;
+}
+
+.sprees-title {
+    font-size: 18px;
+    padding-top: 10px;
+}
+
+#ranked-stats-container p span {
+    float: right;
+}
+
+.champion-stats {
+    float: left;
+    margin-bottom: 40px;
+}
+
+.gameModes {
+    float: left;
+    width: 300px;
+    margin: 20px;
+    margin-bottom: 50px;
+}
+
+summoner-profile {
+    color: white
 }

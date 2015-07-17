@@ -11,10 +11,9 @@
 
     <body>
         <div id="page-container">
-            <summoner-search ng-controller="SearchCtrl"></summoner-search>
-            <summoner-profile ng-controller="ViewCtrl" ng-show="viewActive"></summoner-profile>
+            <summoner-search ng-controller="SearchCtrl" ng-show="viewSearch"></summoner-search>
+            <summoner-profile ng-controller="ViewCtrl" ng-show="viewProfile"></summoner-profile>
         </div>
-
 
         <!-- Libraries  -->
         <script type="text/javascript" src="lib/jquery-1.11.3.min.js"></script>

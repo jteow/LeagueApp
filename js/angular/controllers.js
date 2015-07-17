@@ -5,7 +5,6 @@ angular.module('app')
     // League info
     .controller('SearchCtrl', ['leagueApi', '$scope', '$rootScope', 'summonerStatsFactory',
         function(leagueApi, $scope, $rootScope, summonerStatsFactory){
-
         //variables
         $scope.summonerName = "";
         $scope.regions = ['oce', 'na', 'eune', 'euw', 'kr'];
@@ -13,14 +12,13 @@ angular.module('app')
         $scope.summonerStats = null;
         $scope.unranked = null;
         $scope.ranked = null;
-        $scope.viewActive = true;
+        $scope.viewSearch = true;
 
         //
         // Setting the region
         //
         $scope.selectRegion = function(region){
             $scope.selectedRegion = region;
-            console.log($scope.selectedRegion)
         };
 
         //
@@ -48,181 +46,207 @@ angular.module('app')
         //Function to get all the summoner's statistics
         //
         $scope.getSummonerStats = function(name) {
-            //Send api request
-            leagueApi.getSummonerId($scope.selectedRegion, name).success(function (data) {
 
-                //Obtaining summoner name and ID as stored in API object
-                var summonerNameApi = Object.keys(data)[0];
-                var summonerId = data[summonerNameApi].id;
-                $scope.summonerName = data[summonerNameApi].name;
+            if (name != "" && name != undefined && name != null) {
 
-                //
-                //Unranked stats
-                //
-                leagueApi.getSummonerData($scope.selectedRegion, summonerId).success(function (data) {
-                    //storing data for specified unranked game types
-                    $scope.unranked = [];
-                    var playerStats = data['playerStatSummaries'];
+                //Send api request
+                leagueApi.getSummonerId($scope.selectedRegion, name).success(function (data) {
 
-                    //Base object construct that will be added to the unranked array
-                    var construct = function(obj, type){
-                        var buildObj = {
-                            //sub-variables that will either be assigned the coressponding data OR
-                            //be assigned default values if a game mode doesn't exist
-                            gameMode: obj ? playerStats[i].playerStatSummaryType : type,
-                            wins: obj ? playerStats[i].wins : 0
-                        };
-                        //push object to unranked array
-                        $scope.unranked.push(buildObj)
-                    };
-
-                    //creating triggers to determine whether game type data exists for summoner
-                    var unRankedTrig = false;
-                    var unRanked3Trig = false;
-                    var unRankedATrig = false;
-
-                    //loop through unranked stats and creating objects based on the game type
-                    for(var i = 0; i < playerStats.length; i++){
-                        if(playerStats[i].playerStatSummaryType == 'Unranked'){
-                            construct(playerStats[i]);
-                            unRankedTrig = true;
-                        }
-                        if(playerStats[i].playerStatSummaryType == 'Unranked3x3'){
-                            construct(playerStats[i]);
-                            unRanked3Trig = true;
-                        }
-                        if(playerStats[i].playerStatSummaryType == 'AramUnranked5x5'){
-                            construct(playerStats[i]);
-                            unRankedATrig = true;
-                        }
-                    }
-
-                    //If any of the triggers did not fire, still create object but with default values
-                    if(!unRankedTrig) {construct(null, 'Unranked')}
-                    if(!unRanked3Trig) {construct(null, 'Unranked3x3')}
-                    if(!unRankedATrig) {construct(null, 'AramUnranked5x5')}
-
+                    //Obtaining summoner name and ID as stored in API object
+                    var summonerNameApi = Object.keys(data)[0];
+                    var summonerId = data[summonerNameApi].id;
+                    $scope.summonerName = data[summonerNameApi].name;
 
                     //
-                    //Ranked stats
+                    //Unranked stats
                     //
-                    leagueApi.getSummonerRankedData($scope.selectedRegion, summonerId).success(function(data){
-                        //storing data from ranked games
-                        $scope.ranked = [];
-                        var playerRankedStats = data['champions'];
+                    leagueApi.getSummonerData($scope.selectedRegion, summonerId).success(function (data) {
+                        //storing data for specified unranked game types
+                        $scope.unranked = [];
+                        var playerStats = data['playerStatSummaries'];
 
-                        //storing ranked stats for each individual champion user has played
-                        //Obj for individual champions
-                        var constructChamp = function(name, title, win, loss, kills, double, triple, quadra, penta){
+                        //Base object construct that will be added to the unranked array
+                        var construct = function(obj, type){
                             var buildObj = {
-                                champName: name,
-                                champTitle: title,
-                                wins: win,
-                                losses: loss,
-                                kills: kills,
-                                doubleKill: double,
-                                tripleKill: triple,
-                                quadraKill: quadra,
-                                pentaKill: penta
+                                //sub-variables that will either be assigned the coressponding data OR
+                                //be assigned default values if a game mode doesn't exist
+                                gameMode: obj ? playerStats[i].playerStatSummaryType : type,
+                                wins: obj ? playerStats[i].wins : 0
                             };
-
-                            $scope.ranked.push(buildObj)
+                            //push object to unranked array
+                            $scope.unranked.push(buildObj)
                         };
 
-                        //Object for overall ranked stats
-                        var constructOverall = function(total, win, loss, gold, time, alive){
-                            var buildObj = {
-                                gamesPlayed: total,
-                                wins: win,
-                                losses: loss,
-                                goldEarned: gold,
-                                timePlayed: time,
-                                timeAlive: alive
-                            };
+                        //creating triggers to determine whether game type data exists for summoner
+                        var unRankedTrig = false;
+                        var unRanked3Trig = false;
+                        var unRankedATrig = false;
 
-                            $scope.ranked.push(buildObj)
-                        };
-
-                        for(var i = 0; i < playerRankedStats.length; i++){
-
-                            var champion = $scope.getChampionName(playerRankedStats[i].id);
-
-                            if(playerRankedStats[i].id !== 0){
-                                constructChamp(champion.name, champion.title,
-                                    playerRankedStats[i].stats.totalSessionsWon,
-                                    playerRankedStats[i].stats.totalSessionsLost,
-                                    playerRankedStats[i].stats.totalChampionKills,
-                                    playerRankedStats[i].stats.totalDoubleKills,
-                                    playerRankedStats[i].stats.totalTripleKills,
-                                    playerRankedStats[i].stats.totalQuadraKills,
-                                    playerRankedStats[i].stats.totalPentaKills
-                                )
-                            }else{
-                                constructOverall(playerRankedStats[i].stats.totalSessionsPlayed,
-                                    playerRankedStats[i].stats.totalSessionsWon,
-                                    playerRankedStats[i].stats.totalSessionsLost,
-                                    playerRankedStats[i].stats.totalGoldEarned,
-                                    playerRankedStats[i].stats.maxTimePlayed,
-                                    playerRankedStats[i].stats.maxTimeSpentLiving
-                                )
+                        //loop through unranked stats and creating objects based on the game type
+                        for(var i = 0; i < playerStats.length; i++){
+                            if(playerStats[i].playerStatSummaryType == 'Unranked'){
+                                construct(playerStats[i]);
+                                unRankedTrig = true;
+                            }
+                            if(playerStats[i].playerStatSummaryType == 'Unranked3x3'){
+                                construct(playerStats[i]);
+                                unRanked3Trig = true;
+                            }
+                            if(playerStats[i].playerStatSummaryType == 'AramUnranked5x5'){
+                                construct(playerStats[i]);
+                                unRankedATrig = true;
                             }
                         }
 
-                        //push final api data to service
-                        //$scope.summonerStats = {
-                        //    name: $scope.summonerName,
-                        //    unranked: $scope.unranked,
-                        //    ranked: $scope.ranked
-                        //};
-                        //summonerStatsFactory.set($scope.summonerStats);
-                        //
-                        //$rootScope.$broadcast('apiFinished')
-                        //
-                        //$scope.viewActive = false;
+                        //If any of the triggers did not fire, still create object but with default values
+                        if(!unRankedTrig) {construct(null, 'Unranked')}
+                        if(!unRanked3Trig) {construct(null, 'Unranked3x3')}
+                        if(!unRankedATrig) {construct(null, 'AramUnranked5x5')}
 
-                    })
-
-                        //.error(function(){
-                        //Insert message saying that the user is yet to play ranked
-                        //$scope.ranked = 'Player is yet to play Ranked mode';
-
-                    //});
-
-                    //push final api data to service
-                    $scope.summonerStats = {
-                        name: $scope.summonerName,
-                        unranked: $scope.unranked,
-                        ranked: $scope.ranked
-                    };
-                    summonerStatsFactory.set($scope.summonerStats);
-
-                    $rootScope.$broadcast('apiFinished')
-
-
-                    $scope.viewActive = false;
+                        $scope.getSummonerRankedData(summonerId)
+                    });
                 });
-            })
+            }
+        };
 
+        /**
+         *
+         * Function to ranked data from ranked api
+         */
+        $scope.getSummonerRankedData = function(summonerId) {
+            leagueApi.getSummonerRankedData($scope.selectedRegion, summonerId).success(function (data) {
+                //storing data from ranked games
+                $scope.ranked = null;
+                $scope.rankedChamps = [];
+                $scope.rankedOverall = null;
+                var playerRankedStats = data['champions'];
 
+                //storing ranked stats for each individual champion user has played
+                //Obj for individual champions
+                var constructChamp = function (id, name, title, win, loss, kills, double, triple, quadra, penta) {
+                    var buildObj = {
+                        id: id,
+                        champName: name,
+                        champTitle: title,
+                        wins: win,
+                        losses: loss,
+                        kills: kills,
+                        doubleKill: double,
+                        tripleKill: triple,
+                        quadraKill: quadra,
+                        pentaKill: penta
+                    };
+
+                    $scope.rankedChamps.push(buildObj)
+                };
+
+                //Object for overall ranked stats
+                var constructOverall = function (id, total, win, loss, gold, time, alive) {
+                    $scope.rankedOverall = {
+                        id: id,
+                        gamesPlayed: total,
+                        wins: win,
+                        losses: loss,
+                        goldEarned: gold,
+                        timePlayed: time,
+                        timeAlive: alive
+                    };
+                };
+
+                for (var i = 0; i < playerRankedStats.length; i++) {
+
+                    var champion = $scope.getChampionName(playerRankedStats[i].id);
+
+                    if (playerRankedStats[i].id !== 0) {
+                        constructChamp(playerRankedStats[i].id,
+                            champion.name, champion.title,
+                            playerRankedStats[i].stats.totalSessionsWon,
+                            playerRankedStats[i].stats.totalSessionsLost,
+                            playerRankedStats[i].stats.totalChampionKills,
+                            playerRankedStats[i].stats.totalDoubleKills,
+                            playerRankedStats[i].stats.totalTripleKills,
+                            playerRankedStats[i].stats.totalQuadraKills,
+                            playerRankedStats[i].stats.totalPentaKills
+                        )
+                    } else if (playerRankedStats[i].id == 0) {
+                        constructOverall(playerRankedStats[i].id,
+                            playerRankedStats[i].stats.totalSessionsPlayed,
+                            playerRankedStats[i].stats.totalSessionsWon,
+                            playerRankedStats[i].stats.totalSessionsLost,
+                            playerRankedStats[i].stats.totalGoldEarned,
+                            playerRankedStats[i].stats.maxTimePlayed,
+                            playerRankedStats[i].stats.maxTimeSpentLiving
+                        )
+                    }
+                }
+
+                //push final api data to service
+                $scope.ranked = {
+                    overall: $scope.rankedOverall,
+                    champs: $scope.rankedChamps
+                };
+
+                $scope.summonerStats = {
+                    name: $scope.summonerName,
+                    unranked: $scope.unranked,
+                    ranked: $scope.ranked
+                };
+                summonerStatsFactory.set($scope.summonerStats);
+
+                $rootScope.$broadcast('apiFinished');
+
+                $scope.viewSearch = false;
+            }).error(function () {
+                $scope.ranked = {
+                    msg: 'Summoner is yet to play ranked'
+                };
+
+                //push final api data to service
+                $scope.summonerStats = {
+                    name: $scope.summonerName,
+                    unranked: $scope.unranked,
+                    ranked: $scope.ranked
+                };
+                summonerStatsFactory.set($scope.summonerStats);
+
+                $rootScope.$broadcast('apiFinished');
+
+                $scope.viewSearch = false;
+            });
         }
+
+
+        $rootScope.$on('showSearchPage', function() {
+            $scope.viewSearch = true;
+            $scope.summonerName = '';
+        });
     }])
 
-    //Page control
-    .controller('ViewCtrl', ['$scope', 'summonerStatsFactory', function($scope, summonerStatsFactory){
-        $scope.viewActive = false;
+    /**
+     *  This control binds the API data to its respective partial
+     */
+    .controller('ViewCtrl', ['$scope', '$rootScope', 'summonerStatsFactory', function($scope, $rootScope, summonerStatsFactory){
+        //toggle variables
+        $scope.viewProfile = false;
+        $scope.hasRanked = null;
+        $scope.isOverall = null;
 
-        $scope.$on('apiFinished', function(){
+        /**
+         * This function lets us go back to the search
+         */
+        $scope.back = function(){
+            $scope.viewProfile = false;
+            $rootScope.$broadcast('showSearchPage');
+        };
+
+        /**
+         * Function assigns local variables for the controller once the API is finished
+         */
+        $scope.$on('apiFinished', function(event){
+            $scope.viewProfile = true;
             $scope.summonerStats = summonerStatsFactory.get();
-            $scope.viewActive = true;
-
-            //View variables
-            $scope.summonerName = $scope.summonerStats.name;
-            $scope.unrankedStats = $scope.summonerStats.unranked;
-            if($scope.summonerStats.ranked !== null) {
-                $scope.ranked = $scope.summonerStats.ranked;
-            }else{
-                $scope.ranked = 'Summoner is yet to play Ranked mode';
-            }
+            $scope.hasRanked = !$scope.summonerStats.ranked.hasOwnProperty('msg');
+            console.log($scope.summonerStats.unranked)
         })
     }]);
 

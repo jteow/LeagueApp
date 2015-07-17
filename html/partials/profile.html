@@ -1,9 +1,46 @@
-<div>
-    <br />
-    <div class="button-api"></div>
+<div id="profile-container">
+    <div id="back" ng-click="back()">Back</div>
+
     <div id="name-container">
-        <span>{{summonerName}}</span>
+        <h1>{{summonerStats.name}}</h1>
     </div>
 
-    <div ng-repeat="mode in unranked">hello</div>
+    <div id="unranked">
+        <h2>Unranked</h2>
+        <div class="gameModes" ng-repeat="mode in summonerStats.unranked">
+            <p>{{mode.gameMode}}</p>
+            <p>{{mode.wins}}</p>
+        </div>
+    </div>
+    <div ng-if="!hasRanked">
+        <h2>Ranked</h2>
+        <div>{{summonerStats.ranked.msg}}</div>
+    </div>
+    <div class="clearfix" id="ranked-stats-container" ng-if="hasRanked">
+        <h2>Ranked</h2>
+        <div id="overall">
+            <h3>Overview</h3>
+            <p> Rank Games Played: <span>{{summonerStats.ranked.overall.gamesPlayed}}</span></p>
+            <p> Wins: <span>{{summonerStats.ranked.overall.wins}}</span></p>
+            <p> Losses: <span>{{summonerStats.ranked.overall.losses}}</span></p>
+            <p> Gold Earned: <span>{{summonerStats.ranked.overall.goldEarned}}</span></p>
+            <p> Total Time Played: <span>{{summonerStats.ranked.overall.timePlayed / 60 | number: 0}}</span></p>
+            <p> Total Time Alive :<span>{{summonerStats.ranked.overall.timeAlive / 60 | number: 0}}</span></p>
+        </div>
+        <div id="champions">
+             <h3>Champions Played</h3>
+
+             <div class="champion-stats" ng-repeat="champ in summonerStats.ranked.champs">
+                 <p> Champion: <span>{{champ.champName}}</span></p>
+                 <p> Champion Title: <span>{{champ.champTitle}}</span></p>
+                 <p> Wins: <span>{{champ.wins}}</span></p>
+                 <p> Losses: <span>{{champ.losses}}</span></p>
+                 <p class="sprees-title"> Sprees: </p>
+                 <p> Double Kills: <span>{{champ.doubleKill}}</span></p>
+                 <p> Triple Kills: <span>{{champ.tripleKill}}</span></p>
+                 <p> Quadra Kills: <span>{{champ.quadraKill}}</span></p>
+                 <p> Penta Kills: <span>{{champ.pentaKill}}</span></p>
+             </div>
+        </div>
+    </div>
 </div>
