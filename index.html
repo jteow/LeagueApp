@@ -11,7 +11,24 @@
 
     <body>
         <div id="page-container">
-            <summoner-search ng-controller="SearchCtrl" ng-show="viewSearch"></summoner-search>
+            <div class="summoner-search clearfix" ng-controller="SearchCtrl" ng-show="viewSearch">
+                <div id="search-title">League of Legends Statistics</div>
+                <div id="canvas"></div>
+                <div id="region-container">
+                    <div  class="region-button"
+                          ng-repeat="region in regions"
+                          ng-class="{'selected' : region == selectedRegion}"
+                          ng-click="selectRegion(region); moveGlobe(region)"
+                          id={{region}}>
+                        <p class="region">{{region | uppercase}}</p>
+                    </div>
+                </div>
+                <div id="search-field-container">
+                    <input placeholder="Summoner Name" ng-model="summonerName" type="text" on-enter="getSummonerStats(summonerName)"/>
+                    <div id="button-api" ng-click="getSummonerStats(summonerName)">Search</div>
+                </div>
+            </div>
+
             <summoner-profile ng-controller="ViewCtrl" ng-show="viewProfile"></summoner-profile>
         </div>
 
@@ -26,5 +43,27 @@
         <script src="js/angular/filters.js"></script>
         <script src="js/angular/routes.js"></script>
         <script src="js/angular/services.js"></script>
+
+        <!-- WebGL Globe -->
+        <script type="text/javascript" src="lib/plugins/globe/third-party/Three/ThreeWebGL.js"></script>
+        <script type="text/javascript" src="lib/plugins/globe/third-party/Three/ThreeExtras.js"></script>
+        <script type="text/javascript" src="lib/plugins/globe/third-party/Three/RequestAnimationFrame.js"></script>
+        <script type="text/javascript" src="lib/plugins/globe/third-party/Three/Detector.js"></script>
+        <script type="text/javascript" src="lib/plugins/globe/third-party/Tween.js"></script>
+        <script type="text/javascript" src="lib/plugins/globe/coast.js"></script>
+        <script type="text/javascript" src="lib/plugins/globe/country.js"></script>
+        <script type="text/javascript" src="lib/plugins/globe/world.js"></script>
+        <script type="text/javascript" src="lib/plugins/globe/white_globe.js"></script>
+        <script type="text/javascript">
+            if(!Detector.webgl){
+                Detector.addGetWebGLMessage();
+            } else {
+                var canvas = document.getElementById('canvas');
+                var globe = new DAT.Globe(canvas);
+                console.log(globe);
+
+                globe.animate();
+            }
+        </script>
     </body>
 </html>

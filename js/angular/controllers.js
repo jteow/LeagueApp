@@ -1,7 +1,5 @@
 angular.module('app')
 
-    //Emilio is always right, Eric too (lots of changes) Joey commits are stronger
-
     // League info
     .controller('SearchCtrl', ['leagueApi', '$scope', '$rootScope', 'summonerStatsFactory',
         function(leagueApi, $scope, $rootScope, summonerStatsFactory){
@@ -14,22 +12,58 @@ angular.module('app')
         $scope.ranked = null;
         $scope.viewSearch = true;
 
-        //
-        // Setting the region
-        //
+        /**
+         *
+         * Setting the region
+         */
         $scope.selectRegion = function(region){
             $scope.selectedRegion = region;
         };
 
-        //
-        //Champion list is constant hence is outside function to avoid getting called repeatedly
-        //
+        /**
+         *
+         * Move globe according to region
+         */
+        $scope.moveGlobe = function(region){
+            switch(region){
+                case 'oce':
+                target.x = 7.05;
+                target.y = 6;
+                break;
+            case 'na':
+                target.x = 9.2;
+                target.y = 7;
+                break;
+            case 'euw':
+                target.x = 4.6;
+                target.y = 7.1;
+                break;
+            case 'eune':
+                target.x = 5;
+                target.y = 7;
+                break;
+            case 'kr':
+                target.x = 6.9;
+                target.y = 6.95;
+                break;
+            default:
+
+            }
+        };
+
+        /**
+         *
+         * Champion list is constant hence is outside function to avoid getting called repeatedly
+         */
         leagueApi.getChampionInfo().success(function(data){
             $scope.championArray = data.data;
             $scope.championNameArray = Object.keys(data.data);
         });
 
-        //utilising id from param to obtain champion name and title
+        /**
+         *
+         * utilising id from param to obtain champion name and title
+         */
         $scope.getChampionName = function(id){
             for(var i = 0; i < $scope.championNameArray.length; i++){
                 if($scope.championArray[$scope.championNameArray[i]].id == id){
@@ -42,9 +76,10 @@ angular.module('app')
             }
         };
 
-        //
-        //Function to get all the summoner's statistics
-        //
+        /**
+         *
+         * Function to get all the summoner's statistics
+         */
         $scope.getSummonerStats = function(name) {
 
             if (name != "" && name != undefined && name != null) {

@@ -6,8 +6,8 @@
     </div>
 
     <div id="unranked">
-        <h2>Unranked</h2>
-        <div class="gameModes" ng-repeat="mode in summonerStats.unranked">
+        <h2>Unranked Wins</h2>
+        <div class="gameModes" ng-repeat="mode in summonerStats.unranked | orderBy:'-gameMode'">
             <p>{{mode.gameMode}}</p>
             <p>{{mode.wins}}</p>
         </div>

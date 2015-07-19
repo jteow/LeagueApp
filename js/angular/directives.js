@@ -1,12 +1,4 @@
 angular.module('app')
-
-    .directive('summonerSearch', function(){
-        return{
-            restrict: 'E',
-            templateUrl: '../../html/partials/search.html'
-        }
-    })
-
     .directive('summonerProfile', function(){
         return{
             restrict: 'E',

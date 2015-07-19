@@ -7,22 +7,18 @@
 
 body {
     width: 100%; height: 100%;
-    background: #222;
-    background-image: url('http://pre08.deviantart.net/044d/th/pre/i/2013/084/4/2/league_of_legends_twitch_tv_background_by_traumuhh-d5z86sk.jpg');
-    background-repeat: no-repeat;
-    background-size: 100%;
+    background: #111;
 }
 
 #page-container {
     width: 1020px;
     margin: auto;
-    margin-top: 50px;
-    padding: 120px 20px 100px;
+    padding: 100px 20px 100px;
     text-align: center;
     background: transparent;
 }
 
-summoner-search {
+.summoner-search {
     width: 400px;
     height: 500px;
     margin: auto;
@@ -34,19 +30,41 @@ summoner-search {
     margin-bottom: 40px;
 }
 
+#canvas {
+    width: 500px;
+    height: 500px;
+    position: relative;
+    left: calc(50% - 250px);
+    text-align: left;
+    background: #111;
+    overflow: hidden;
+    margin-bottom: 20px
+}
+
 .region-button {
     width: 70px;
     display: inline-block;
     padding: 9px 0px;
     margin: 1px;
-    background: #333;
     color: white;
-    box-shadow: 1px 1px 5px #333;
     cursor: pointer;
 }
 
-.region-button:hover {
-    opacity: 0.6;
+.region {
+    display: inline-block;
+    border-bottom: 2px solid #111;
+    padding-bottom: 8px;
+    font-family: helvetica;
+    font-size: 18px;
+    letter-spacing: 1px;
+
+    -webkit-transition: border-bottom 0.1s, padding-bottom 0.1s;
+    transition: border-bottom 0.1s, padding-bottom 0.1s;
+}
+
+.region:hover {
+    border-bottom: 2px solid white;
+    padding-bottom: 1px;
 }
 
 #search-field-container {
@@ -54,7 +72,7 @@ summoner-search {
     margin-top: 10px;
 }
 
-summoner-search input {
+.summoner-search input {
     width: 284px;
     padding: 6px 0px;
     background: white;
@@ -87,6 +105,25 @@ summoner-search input {
     color: white;
     cursor: pointer;
     box-shadow: 1px 1px 5px #333;
+}
+
+#unranked {
+    display: inline-block;
+    position: relative;
+}
+
+#unranked:after {
+    background-image: url('../images/unranked_bg.png');
+    background-size: 100%;
+    background-repeat: no-repeat;
+    content: "";
+    opacity: 0.5;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    z-index: -1;
 }
 
 #ranked-stats-container {

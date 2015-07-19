@@ -1,0 +1,19 @@
+function onMouseMove(event) {
+    mouse.x = - event.clientX;
+    mouse.y = event.clientY;
+
+    var dx = mouseOnDown.x - (-event.clientX);
+    var dy = mouseOnDown.y - event.clientY;
+    var d = Math.sqrt(dx*dx + dy*dy);
+    if (d > 5) {
+      clickEnabled = false;
+    }
+
+    var zoomDamp = distance/1000;
+
+    target.x = targetOnDown.x + (mouse.x - mouseOnDown.x) * 0.005 * zoomDamp * 3;
+    target.y = targetOnDown.y + (mouse.y - mouseOnDown.y) * 0.005 * zoomDamp * 3;
+
+    target.y = target.y > PI_HALF ? PI_HALF : target.y;
+    target.y = target.y < - PI_HALF ? - PI_HALF : target.y;
+  }
