@@ -1,8 +1,8 @@
 angular.module('app')
 
     // League info
-    .controller('SearchCtrl', ['leagueApi', '$scope', '$rootScope', 'summonerStatsFactory',
-        function(leagueApi, $scope, $rootScope, summonerStatsFactory){
+    .controller('SearchCtrl', ['leagueApi', '$scope', '$rootScope', 'summonerStatsFactory', '$q',
+        function(leagueApi, $scope, $rootScope, summonerStatsFactory, $q){
         //variables
         $scope.summonerName = "";
         $scope.regions = ['oce', 'na', 'eune', 'euw', 'kr'];
@@ -11,6 +11,7 @@ angular.module('app')
         $scope.unranked = null;
         $scope.ranked = null;
         $scope.viewSearch = true;
+        $scope.errorMsg = false;
 
         /**
          *
@@ -18,6 +19,14 @@ angular.module('app')
          */
         $scope.selectRegion = function(region){
             $scope.selectedRegion = region;
+        };
+
+        /**
+         *
+         * Remove error message once user starts typing
+         */
+        $scope.hideErrorMsg = function(){
+            $scope.errorMsg = false;
         };
 
         /**
@@ -51,10 +60,10 @@ angular.module('app')
             }
         };
 
-        /**
-         *
-         * Champion list is constant hence is outside function to avoid getting called repeatedly
-         */
+       /**
+        *
+        * Champion list is constant hence is outside function to avoid getting called repeatedly
+        */
         leagueApi.getChampionInfo().success(function(data){
             $scope.championArray = data.data;
             $scope.championNameArray = Object.keys(data.data);
@@ -76,79 +85,96 @@ angular.module('app')
             }
         };
 
+
+
+
         /**
          *
          * Function to get all the summoner's statistics
          */
         $scope.getSummonerStats = function(name) {
-
+            var promises = [];
+            //If name is not empty
             if (name != "" && name != undefined && name != null) {
 
-                //Send api request
-                leagueApi.getSummonerId($scope.selectedRegion, name).success(function (data) {
-
+                leagueApi.getSummonerId($scope.selectedRegion, name).success(function(data){
                     //Obtaining summoner name and ID as stored in API object
-                    var summonerNameApi = Object.keys(data)[0];
+                    var summonerNameApi = name.toLowerCase();
                     var summonerId = data[summonerNameApi].id;
                     $scope.summonerName = data[summonerNameApi].name;
 
-                    //
-                    //Unranked stats
-                    //
-                    leagueApi.getSummonerData($scope.selectedRegion, summonerId).success(function (data) {
-                        //storing data for specified unranked game types
-                        $scope.unranked = [];
-                        var playerStats = data['playerStatSummaries'];
+                    promises.push($scope.getSummonerUnrankedData(summonerId));
+                    promises.push($scope.getSummonerRankedData(summonerId));
 
-                        //Base object construct that will be added to the unranked array
-                        var construct = function(obj, type){
-                            var buildObj = {
-                                //sub-variables that will either be assigned the coressponding data OR
-                                //be assigned default values if a game mode doesn't exist
-                                gameMode: obj ? playerStats[i].playerStatSummaryType : type,
-                                wins: obj ? playerStats[i].wins : 0
-                            };
-                            //push object to unranked array
-                            $scope.unranked.push(buildObj)
-                        };
-
-                        //creating triggers to determine whether game type data exists for summoner
-                        var unRankedTrig = false;
-                        var unRanked3Trig = false;
-                        var unRankedATrig = false;
-
-                        //loop through unranked stats and creating objects based on the game type
-                        for(var i = 0; i < playerStats.length; i++){
-                            if(playerStats[i].playerStatSummaryType == 'Unranked'){
-                                construct(playerStats[i]);
-                                unRankedTrig = true;
-                            }
-                            if(playerStats[i].playerStatSummaryType == 'Unranked3x3'){
-                                construct(playerStats[i]);
-                                unRanked3Trig = true;
-                            }
-                            if(playerStats[i].playerStatSummaryType == 'AramUnranked5x5'){
-                                construct(playerStats[i]);
-                                unRankedATrig = true;
-                            }
-                        }
-
-                        //If any of the triggers did not fire, still create object but with default values
-                        if(!unRankedTrig) {construct(null, 'Unranked')}
-                        if(!unRanked3Trig) {construct(null, 'Unranked3x3')}
-                        if(!unRankedATrig) {construct(null, 'AramUnranked5x5')}
-
-                        $scope.getSummonerRankedData(summonerId)
-                    });
-                });
+                    $q.all(promises);
+                }).error(function(){
+                    $scope.errorMsg = true;
+                    $scope.summonerName = '';
+                })
             }
+        };
+
+
+        /**
+         *
+         * Function to get summoner's unranked data
+         */
+        $scope.getSummonerUnrankedData = function(summonerId){
+            var deferred = $q.defer;
+            leagueApi.getSummonerData($scope.selectedRegion, summonerId).success(function (data) {
+                //storing data for specified unranked game types
+                $scope.unranked = [];
+                var playerStats = data['playerStatSummaries'];
+
+                //Base object construct that will be added to the unranked array
+                var construct = function(obj, type){
+                    var buildObj = {
+                        //sub-variables that will either be assigned the coressponding data OR
+                        //be assigned default values if a game mode doesn't exist
+                        gameMode: obj ? playerStats[i].playerStatSummaryType : type,
+                        wins: obj ? playerStats[i].wins : 0
+                    };
+                    //push object to unranked array
+                    $scope.unranked.push(buildObj)
+                };
+
+                //creating triggers to determine whether game type data exists for summoner
+                var unRankedTrig = false;
+                var unRanked3Trig = false;
+                var unRankedATrig = false;
+
+                //loop through unranked stats and creating objects based on the game type
+                for(var i = 0; i < playerStats.length; i++){
+                    if(playerStats[i].playerStatSummaryType == 'Unranked'){
+                        construct(playerStats[i]);
+                        unRankedTrig = true;
+                    }
+                    if(playerStats[i].playerStatSummaryType == 'Unranked3x3'){
+                        construct(playerStats[i]);
+                        unRanked3Trig = true;
+                    }
+                    if(playerStats[i].playerStatSummaryType == 'AramUnranked5x5'){
+                        construct(playerStats[i]);
+                        unRankedATrig = true;
+                    }
+                }
+
+                //If any of the triggers did not fire, still create object but with default values
+                if(!unRankedTrig) {construct(null, 'Unranked')}
+                if(!unRanked3Trig) {construct(null, 'Unranked3x3')}
+                if(!unRankedATrig) {construct(null, 'AramUnranked5x5')}
+                return deferred.promise;
+            }).error(function(e) {
+                return deferred.reject;
+            });
         };
 
         /**
          *
-         * Function to ranked data from ranked api
+         * Function to get ranked data from ranked api
          */
         $scope.getSummonerRankedData = function(summonerId) {
+            var deferred = $q.defer;
             leagueApi.getSummonerRankedData($scope.selectedRegion, summonerId).success(function (data) {
                 //storing data from ranked games
                 $scope.ranked = null;
@@ -231,6 +257,8 @@ angular.module('app')
                 $rootScope.$broadcast('apiFinished');
 
                 $scope.viewSearch = false;
+
+                return deferred.promise;
             }).error(function () {
                 $scope.ranked = {
                     msg: 'Summoner is yet to play ranked'
@@ -247,8 +275,10 @@ angular.module('app')
                 $rootScope.$broadcast('apiFinished');
 
                 $scope.viewSearch = false;
+
+                return deferred.reject;
             });
-        }
+        };
 
 
         $rootScope.$on('showSearchPage', function() {
@@ -256,6 +286,8 @@ angular.module('app')
             $scope.summonerName = '';
         });
     }])
+
+
 
     /**
      *  This control binds the API data to its respective partial
@@ -281,7 +313,6 @@ angular.module('app')
             $scope.viewProfile = true;
             $scope.summonerStats = summonerStatsFactory.get();
             $scope.hasRanked = !$scope.summonerStats.ranked.hasOwnProperty('msg');
-            console.log($scope.summonerStats.unranked)
         })
     }]);
 

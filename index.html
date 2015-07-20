@@ -24,8 +24,9 @@
                     </div>
                 </div>
                 <div id="search-field-container">
-                    <input placeholder="Summoner Name" ng-model="summonerName" type="text" on-enter="getSummonerStats(summonerName)"/>
+                    <input placeholder="Summoner Name" ng-model="summonerName" type="text" on-enter="getSummonerStats(summonerName)" ng-change="hideErrorMsg()"/>
                     <div id="button-api" ng-click="getSummonerStats(summonerName)">Search</div>
+                    <p id="error-msg" ng-show="errorMsg">Summoner does not exist</p>
                 </div>
             </div>
 
